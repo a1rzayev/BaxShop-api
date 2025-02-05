@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const Roles = require('../utils/roles');
+const JwtService = require('./jwtService');
 
 const signup = async (data) => {
   const { email, password, name, role } = data;
@@ -40,7 +41,9 @@ const login = async (data) => {
     throw new Error('Invalid email or password');
   }
 
-  return { email };
+  const token = JwtService.sign({ userId: user._id, role: user.role });
+
+  return { token };
 };
 
 module.exports = { signup, login };
