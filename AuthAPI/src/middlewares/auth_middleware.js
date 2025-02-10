@@ -1,7 +1,8 @@
 const jwtService = require('../services/jwt_service');
 const User = require('../models/user');
+const Roles = require('../utils/roles');
 
-exports.authenticate = async (req, res, next) => {
+const authenticate = async (req, res, next) => {
     try {
         const token = req.header('Authorization')?.replace('Bearer ', '');
         if (!token) return res.status(401).json({ message: 'Unauthorized' });
@@ -16,3 +17,16 @@ exports.authenticate = async (req, res, next) => {
         return res.status(401).json({ message: 'Invalid token' });
     }
 };
+
+
+const authorizeRole = (requiredRole) => {
+  return (req, res, next) => {
+    if (!req.user || req.user.role !== requiredRole) {
+      return res.status(403).json({ message: 'Access denied. Insufficient permissions.' });
+    }
+    next();
+  };
+};
+
+module.exports = {authorizeRole, authenticate};
+
